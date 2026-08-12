@@ -30,38 +30,31 @@ new class extends Component {
     }
 }; ?>
 
-<div class="mx-auto max-w-sm">
-    <h1 class="text-xl font-semibold">Log in</h1>
-    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome back.</p>
+<div class="mx-auto max-w-sm" x-data x-init="$dream.enter($el)">
+    <div class="dream-panel p-7">
+        <h1 class="font-display text-3xl font-semibold">Log in</h1>
+        <p class="mt-1.5 text-sm text-ink-soft dark:text-moon-soft">Welcome back.</p>
 
-    <form wire:submit="login" class="mt-6 space-y-4">
-        <div>
-            <label for="email" class="block text-sm font-medium">Email</label>
-            <input wire:model="email" id="email" type="email" autocomplete="email"
-                class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900">
-            @error('email') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
-        </div>
+        <form wire:submit="login" class="mt-7 space-y-5">
+            <x-field name="email" label="Email" type="email" autocomplete="email" />
+            <x-field name="password" label="Password" type="password" autocomplete="current-password" />
 
-        <div>
-            <label for="password" class="block text-sm font-medium">Password</label>
-            <input wire:model="password" id="password" type="password" autocomplete="current-password"
-                class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900">
-            @error('password') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
-        </div>
+            <label class="flex cursor-pointer items-center gap-2.5 text-sm text-ink-soft dark:text-moon-soft">
+                <input wire:model="remember" type="checkbox"
+                    class="size-4 cursor-pointer rounded-md border-white/80 accent-violet-500 dark:border-white/20">
+                Remember me
+            </label>
 
-        <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <input wire:model="remember" type="checkbox" class="rounded border-gray-300 dark:border-gray-700">
-            Remember me
-        </label>
+            <button type="submit" class="dream-btn w-full" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="login">Log in</span>
+                <span wire:loading wire:target="login">Just a moment…</span>
+            </button>
+        </form>
+    </div>
 
-        <button type="submit"
-            class="w-full cursor-pointer rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">
-            Log in
-        </button>
-    </form>
-
-    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+    <p class="mt-5 text-center text-sm text-ink-soft dark:text-moon-soft">
         No account?
-        <a href="{{ route('register') }}" wire:navigate class="font-medium text-gray-900 underline dark:text-white">Register</a>
+        <a href="{{ route('register') }}" wire:navigate
+            class="font-semibold text-violet-600 underline decoration-violet-300 underline-offset-4 dark:text-violet-300 dark:decoration-violet-500">Register</a>
     </p>
 </div>
