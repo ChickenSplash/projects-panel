@@ -1,0 +1,24 @@
+services:
+    app:
+        build: .
+        container_name: project-panel
+        hostname: project-panel
+        ports:
+            - '3000:3000'
+        environment:
+            APP_NAME: 'Projects Panel'
+            APP_ENV: production
+            APP_DEBUG: 'false'
+            APP_URL: 'http://project-panel:3000'
+            APP_KEY: '${APP_KEY:-}'
+            DB_CONNECTION: sqlite
+            DB_DATABASE: /app/database/database.sqlite
+            SESSION_DRIVER: database
+            CACHE_STORE: database
+            QUEUE_CONNECTION: sync
+        volumes:
+            - database:/app/database
+        restart: unless-stopped
+
+volumes:
+    database:
