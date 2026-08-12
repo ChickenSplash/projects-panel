@@ -31,20 +31,33 @@ resources/views/layouts/app.blade.php              # tabs, theme switch, log in 
 
 ## Run it with Docker
 
+The app joins the external `edge` network, which the cloudflared stack creates. Bring cloudflared up
+first, or create the network yourself:
+
+```bash
+docker network create edge   # only if the cloudflared stack is not up
+docker compose up -d --build
+```
+
 Served on port 3000. The hostname `project-panel` comes from the container name, so add it to your
-hosts file once:
+hosts file if you want to reach it directly:
 
 ```bash
 echo '127.0.0.1 project-panel' | sudo tee -a /etc/hosts
 ```
 
-Then:
-
-```bash
-docker compose up -d --build
-```
-
 Open <http://project-panel:3000> and register an account.
+
+### Behind the Cloudflare tunnel
+
+Point the tunnel's public hostname at **`http://project-panel:3000`** — cloudflared resolves that name
+over the shared `edge` network, so no ports need publishing at all (drop the `ports` block if the
+tunnel should be the only way in).
+
+Cloudflare terminates TLS and cloudflared forwards plain HTTP, so the app trusts the forwarded headers
+(`trustProxies` in `bootstrap/app.php`). Without that, Laravel would generate `http://` asset and form
+URLs on an `https://` page and the browser would block them. Set `APP_URL` to the public tunnel URL as
+well; it is used for links generated outside a request.
 
 The SQLite file lives in the `database` volume, so data survives `docker compose down`. Migrations run
 on container start. An `APP_KEY` is generated inside the container if you do not supply one; set it in
