@@ -21,12 +21,16 @@ new class extends Component {
         ]);
 
         $this->reset('title', 'url');
+
+        $this->dispatch('notify', message: 'Posted into the ether');
     }
 
     public function delete(int $projectId): void
     {
         // Scoped to the current user's projects, so there is nothing else to authorise.
         Auth::user()->projects()->whereKey($projectId)->delete();
+
+        $this->dispatch('notify', message: 'Gone without a trace');
     }
 
     /** @return array<string, mixed> */
@@ -39,46 +43,47 @@ new class extends Component {
 }; ?>
 
 <div>
-    <h1 class="text-xl font-semibold">My projects</h1>
-    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Post a project with a link.</p>
+    <header x-data x-init="$dream.enter($el)">
+        <h1 class="font-display text-4xl font-semibold">My projects</h1>
+        <p class="mt-2 text-ink-soft dark:text-moon-soft">Post a project with a link.</p>
+    </header>
 
-    <form wire:submit="save" class="mt-6 space-y-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-        <div>
-            <label for="title" class="block text-sm font-medium">Title</label>
-            <input wire:model="title" id="title" type="text" placeholder="My side project"
-                class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950">
-            @error('title') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
-        </div>
+    <form wire:submit="save" x-data x-init="$dream.enter($el)" class="dream-panel mt-8 space-y-5 p-6">
+        <x-field name="title" label="Title" placeholder="My side project" />
+        <x-field name="url" label="Link" type="url" placeholder="https://example.com" />
 
-        <div>
-            <label for="url" class="block text-sm font-medium">Link</label>
-            <input wire:model="url" id="url" type="url" placeholder="https://example.com"
-                class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950">
-            @error('url') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
-        </div>
-
-        <button type="submit"
-            class="cursor-pointer rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200">
-            Post project
+        <button type="submit" class="dream-btn" wire:loading.attr="disabled">
+            <x-icon name="sparkle" class="size-4" />
+            <span wire:loading.remove wire:target="save">Post project</span>
+            <span wire:loading wire:target="save">Posting…</span>
         </button>
     </form>
 
-    <ul class="mt-6 divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
+    <ul class="mt-8 space-y-3">
         @forelse ($projects as $project)
-            <li class="flex items-baseline justify-between gap-4 px-4 py-3">
-                <div class="min-w-0">
-                    <a href="{{ $project->url }}" target="_blank" rel="noopener noreferrer"
-                        class="font-medium hover:underline">{{ $project->title }}</a>
-                    <p class="truncate text-sm text-gray-500 dark:text-gray-400">{{ $project->url }}</p>
-                </div>
-                <button type="button" wire:click="delete({{ $project->id }})" wire:confirm="Delete this project?"
-                    class="shrink-0 cursor-pointer text-sm text-red-600 hover:underline dark:text-red-400">
-                    Delete
+            <x-project-card :project="$project">
+                {{-- Two taps instead of a browser confirm dialog, so the whole flow stays in the page. --}}
+                <button type="button" x-show="! confirming" x-on:click="confirming = true"
+                    class="dream-btn-quiet px-3 py-2 hover:text-rose-500 dark:hover:text-rose-300" title="Delete">
+                    <x-icon name="trash" class="size-4" />
+                    <span class="sr-only">Delete {{ $project->title }}</span>
                 </button>
-            </li>
+
+                <div x-show="confirming" x-cloak x-transition.opacity.duration.200ms class="flex items-center gap-2">
+                    <button type="button" x-on:click="confirming = false" class="dream-btn-quiet px-3 py-2">
+                        Keep
+                    </button>
+                    <button type="button" class="dream-btn-danger"
+                        x-on:click="await $dream.leave($root); $wire.delete({{ $project->id }})">
+                        Delete
+                    </button>
+                </div>
+            </x-project-card>
         @empty
-            <li class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                You have not posted anything yet.
+            <li x-data x-init="$dream.enter($el)" class="dream-panel px-6 py-14 text-center">
+                <x-icon name="sparkle" class="mx-auto size-8 text-violet-400 dark:text-violet-300" />
+                <p class="mt-3 font-display text-xl font-semibold">Your shelf is empty</p>
+                <p class="mt-1 text-sm text-ink-soft dark:text-moon-soft">Post something above and it will land here.</p>
             </li>
         @endforelse
     </ul>

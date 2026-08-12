@@ -28,17 +28,29 @@
 
         @livewireStyles
     </head>
-    <body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
-        <header class="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-            <div class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3">
-                <a href="{{ route('projects') }}" wire:navigate class="font-semibold">Projects Panel</a>
+    <body class="min-h-dvh font-sans text-ink antialiased dark:text-moon">
+        {{-- Drifting colour behind the whole app. Decorative, so it is hidden from assistive tech. --}}
+        <div class="dream-sky" aria-hidden="true">
+            <span class="aurora aurora--iris"></span>
+            <span class="aurora aurora--blush"></span>
+            <span class="aurora aurora--mint"></span>
+            <span class="aurora aurora--sky"></span>
+            <span class="stardust"></span>
+        </div>
 
-                <div class="flex items-center gap-3">
-                    <div class="flex gap-0.5 rounded-lg border border-gray-200 p-0.5 dark:border-gray-700">
-                        @foreach (['system' => 'Auto', 'light' => 'Light', 'dark' => 'Dark'] as $value => $label)
-                            <button type="button" data-theme-option="{{ $value }}"
-                                class="cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:text-gray-900 data-[active=true]:bg-gray-900 data-[active=true]:text-white dark:text-gray-400 dark:hover:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-gray-900">
-                                {{ $label }}
+        <header class="mx-auto w-full max-w-3xl px-4 pt-6">
+            <div class="dream-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <a href="{{ route('projects') }}" wire:navigate class="flex items-center gap-3">
+                    <span class="dream-orb"></span>
+                    <span class="font-display text-lg font-semibold">Projects Panel</span>
+                </a>
+
+                <div class="flex items-center gap-2">
+                    <div class="dream-switch">
+                        @foreach (['system' => ['Auto', 'auto'], 'light' => ['Light', 'sun'], 'dark' => ['Dark', 'moon']] as $value => [$label, $icon])
+                            <button type="button" data-theme-option="{{ $value }}" title="{{ $label }}">
+                                <x-icon :name="$icon" class="size-4" />
+                                <span class="sr-only">{{ $label }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -46,25 +58,21 @@
                     @auth
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="cursor-pointer text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                                Log out
-                            </button>
+                            <button type="submit" class="dream-link">Log out</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" wire:navigate class="text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-                            Log in
-                        </a>
+                        <a href="{{ route('login') }}" wire:navigate class="dream-link">Log in</a>
                     @endauth
                 </div>
             </div>
 
-            <nav class="mx-auto flex max-w-3xl gap-6 px-4">
+            <nav class="mt-3 flex items-center gap-1.5 px-1">
                 @foreach ([['projects', 'All projects'], ['my-projects', 'My projects']] as [$route, $label])
                     <a href="{{ route($route) }}" wire:navigate
                         @class([
-                            '-mb-px border-b-2 py-2 text-sm font-medium',
-                            'border-gray-900 text-gray-900 dark:border-white dark:text-white' => request()->routeIs($route),
-                            'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' => ! request()->routeIs($route),
+                            'dream-tab',
+                            'dream-tab-active' => request()->routeIs($route),
+                            'dream-tab-idle' => ! request()->routeIs($route),
                         ])>
                         {{ $label }}
                     </a>
@@ -72,9 +80,20 @@
             </nav>
         </header>
 
-        <main class="mx-auto max-w-3xl px-4 py-8">
+        <main class="mx-auto max-w-3xl px-4 pt-8 pb-16">
             {{ $slot }}
         </main>
+
+        <footer class="pb-10 text-center text-xs font-semibold tracking-[0.18em] text-ink-soft/70 uppercase dark:text-moon-soft/60">
+            Made of links and daydreams
+        </footer>
+
+        {{-- One toast for the whole app; components raise it with `$this->dispatch('notify', message: '…')`. --}}
+        <div class="pointer-events-none fixed inset-x-0 bottom-8 z-50 flex justify-center px-4"
+            x-data="{ message: '' }"
+            x-on:notify.window="message = $event.detail.message; $dream.toast($refs.toast)">
+            <p x-ref="toast" x-text="message" class="dream-toast"></p>
+        </div>
 
         @livewireScripts
     </body>
