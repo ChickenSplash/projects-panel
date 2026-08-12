@@ -19,7 +19,7 @@ class ProjectsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Someone elses project')
-            ->assertSee($project->user->name);
+            ->assertSee($project->user->username);
     }
 
     public function test_guests_cannot_reach_the_posting_page(): void
