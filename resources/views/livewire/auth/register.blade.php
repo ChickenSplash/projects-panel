@@ -6,7 +6,7 @@ use Illuminate\Validation\Rules\Password;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public string $name = '';
+    public string $username = '';
 
     public string $email = '';
 
@@ -17,7 +17,7 @@ new class extends Component {
     public function register(): mixed
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ]);
@@ -34,7 +34,7 @@ new class extends Component {
         <p class="mt-1.5 text-sm text-ink-soft dark:text-moon-soft">Create an account to post projects.</p>
 
         <form wire:submit="register" class="mt-7 space-y-5">
-            <x-field name="name" label="Name" autocomplete="name" />
+            <x-field name="username" label="Username" autocomplete="username" />
             <x-field name="email" label="Email" type="email" autocomplete="email" />
             <x-field name="password" label="Password" type="password" autocomplete="new-password" />
             <x-field name="password_confirmation" label="Confirm password" type="password" autocomplete="new-password" />

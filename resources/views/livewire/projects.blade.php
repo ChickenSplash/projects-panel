@@ -26,7 +26,7 @@ new class extends Component {
         @forelse ($projects as $project)
             <x-project-card :project="$project">
                 <p class="text-right text-sm text-ink-soft dark:text-moon-soft">
-                    <span class="font-semibold text-ink dark:text-moon">{{ $project->user->name }}</span>
+                    <span class="font-semibold text-ink dark:text-moon">{{ $project->user->username }}</span>
                     <br>
                     {{ $project->created_at->diffForHumans() }}
                 </p>

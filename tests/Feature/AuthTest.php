@@ -41,7 +41,7 @@ class AuthTest extends TestCase
     public function test_a_user_can_register(): void
     {
         Volt::test('auth.register')
-            ->set('name', 'Taylor')
+            ->set('username', 'taylor')
             ->set('email', 'taylor@example.com')
             ->set('password', 'password')
             ->set('password_confirmation', 'password')
