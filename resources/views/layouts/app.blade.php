@@ -56,6 +56,13 @@
                     </div>
 
                     @auth
+                        {{-- Sits beside the account menu rather than in the tabs: it is a setting, not a place to browse. --}}
+                        <a href="{{ route('api-token') }}" wire:navigate title="API token"
+                            @class(['dream-btn-quiet flex items-center p-2.5', 'text-ink dark:text-moon' => request()->routeIs('api-token')])>
+                            <x-icon name="key" class="size-4" />
+                            <span class="sr-only">API token</span>
+                        </a>
+
                         {{-- The account menu: a disclosure, so `aria-expanded` on the trigger is all it owes assistive tech. --}}
                         <div class="relative" x-data="{ open: false }" x-on:keydown.escape="open = false">
                             <button type="button" class="dream-user" x-on:click="open = ! open" :aria-expanded="open">

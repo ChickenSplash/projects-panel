@@ -58,6 +58,9 @@ new class extends Component {
         session()->invalidate();
         session()->regenerateToken();
 
+        // Tokens have no foreign key to cascade on, so they have to be swept by hand.
+        $user->tokens()->delete();
+
         // Projects cascade with the user, so the shared list loses them too.
         $user->delete();
 
