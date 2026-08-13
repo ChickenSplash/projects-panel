@@ -7,7 +7,7 @@ A tiny Laravel + Livewire app where people post projects as links.
 - **Profile** (`/profile`) — change your username, email or password, or delete your account. Reached
   from the account menu in the header, which is the username itself once you are logged in.
 - **API token** (`/api-token`) — generate a token and post projects from outside the app. Reached from
-  the key beside the account menu.
+  the same account menu.
 
 Usernames are unique: the column carries a unique index and registering with one that is already
 spoken for comes back as "Username already taken".
@@ -34,7 +34,7 @@ by hand.
 ## API
 
 One endpoint, so a project can be posted from a script instead of the form. Generate a token on
-`/api-token` (the key beside the account menu) and send it as a bearer token:
+`/api-token` (in the account menu) and send it as a bearer token:
 
 ```bash
 curl -X POST https://yourapp.test/api/projects \
