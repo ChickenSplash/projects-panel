@@ -89,6 +89,7 @@ class AuthTest extends TestCase
             ->assertOk()
             ->assertSee('taylor')
             ->assertSee(route('profile'))
+            ->assertSee(route('api-token'))
             ->assertSee('Log out');
     }
 
