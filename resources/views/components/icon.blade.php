@@ -50,4 +50,23 @@
             <path d="M8 16 16 8m-6 0h6v6" />
         </svg>
         @break
+
+    @case('chevron')
+        <svg {{ $svg }}>
+            <path d="m6 9.5 6 5.5 6-5.5" />
+        </svg>
+        @break
+
+    @case('user')
+        <svg {{ $svg }}>
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5 20a7 7 0 0 1 14 0" />
+        </svg>
+        @break
+
+    @case('exit')
+        <svg {{ $svg }}>
+            <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M11 8.5 14.5 12 11 15.5M14.5 12H4" />
+        </svg>
+        @break
 @endswitch

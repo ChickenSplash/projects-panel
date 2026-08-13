@@ -53,6 +53,45 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'taylor@example.com']);
     }
 
+    public function test_registering_fails_when_the_username_is_already_taken(): void
+    {
+        User::factory()->create(['username' => 'taylor']);
+
+        Volt::test('auth.register')
+            ->set('username', 'taylor')
+            ->set('email', 'someone-else@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->call('register')
+            ->assertHasErrors(['username' => 'unique']);
+
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 1);
+    }
+
+    public function test_the_taken_username_message_is_the_one_we_wrote(): void
+    {
+        User::factory()->create(['username' => 'taylor']);
+
+        Volt::test('auth.register')
+            ->set('username', 'taylor')
+            ->set('email', 'someone-else@example.com')
+            ->set('password', 'password')
+            ->set('password_confirmation', 'password')
+            ->call('register')
+            ->assertSee('Username already taken');
+    }
+
+    public function test_the_header_offers_the_username_as_a_menu_once_logged_in(): void
+    {
+        $this->actingAs(User::factory()->create(['username' => 'taylor']))
+            ->get('/')
+            ->assertOk()
+            ->assertSee('taylor')
+            ->assertSee(route('profile'))
+            ->assertSee('Log out');
+    }
+
     public function test_a_user_can_log_out(): void
     {
         $this->actingAs(User::factory()->create())

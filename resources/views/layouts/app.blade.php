@@ -56,10 +56,31 @@
                     </div>
 
                     @auth
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="dream-link">Log out</button>
-                        </form>
+                        {{-- The account menu: a disclosure, so `aria-expanded` on the trigger is all it owes assistive tech. --}}
+                        <div class="relative" x-data="{ open: false }" x-on:keydown.escape="open = false">
+                            <button type="button" class="dream-user" x-on:click="open = ! open" :aria-expanded="open">
+                                <span class="dream-user-mark" aria-hidden="true">{{ Str::upper(Str::substr(auth()->user()->username, 0, 1)) }}</span>
+                                <span class="max-w-36 truncate">{{ auth()->user()->username }}</span>
+                                <x-icon name="chevron" class="size-3.5 shrink-0 transition duration-300"
+                                    x-bind:class="open && 'rotate-180'" />
+                            </button>
+
+                            <div x-show="open" x-cloak x-on:click.outside="open = false"
+                                x-transition.origin.top.right.duration.200ms class="dream-menu">
+                                <a href="{{ route('profile') }}" wire:navigate class="dream-menu-item">
+                                    <x-icon name="user" class="size-4" />
+                                    Profile
+                                </a>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dream-menu-item">
+                                        <x-icon name="exit" class="size-4" />
+                                        Log out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}" wire:navigate class="dream-link">Log in</a>
                     @endauth
