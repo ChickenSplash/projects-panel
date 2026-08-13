@@ -4,6 +4,11 @@ A tiny Laravel + Livewire app where people post projects as links.
 
 - **All projects** (`/`) — every project from every user, newest first.
 - **My projects** (`/my-projects`) — post your own project (title + link), or delete one.
+- **Profile** (`/profile`) — change your username, email or password, or delete your account. Reached
+  from the account menu in the header, which is the username itself once you are logged in.
+
+Usernames are unique: the column carries a unique index and registering with one that is already
+spoken for comes back as "Username already taken".
 
 ## Stack
 
@@ -26,9 +31,10 @@ Each page is one Volt file — markup and component class together:
 ```
 resources/views/livewire/projects.blade.php        # tab 1: everyone's projects
 resources/views/livewire/my-projects.blade.php     # tab 2: post / delete your own
+resources/views/livewire/profile.blade.php         # details, password, delete account
 resources/views/livewire/auth/login.blade.php
 resources/views/livewire/auth/register.blade.php
-resources/views/layouts/app.blade.php              # sky, header, tabs, theme switch, toast
+resources/views/layouts/app.blade.php              # sky, header, account menu, tabs, theme switch, toast
 resources/views/components/                        # project-card, field, icon
 resources/views/pagination.blade.php               # newer / older, passed to ->links()
 ```
@@ -121,7 +127,8 @@ php artisan test
 ## Deliberately left out (YAGNI)
 
 Email verification, password reset, login throttling, editing projects, and project descriptions.
-Auth is email + password only.
+Auth is email + password only. Changing your password on the profile page needs the current one, so it
+is not a reset; forgetting it is still unrecoverable.
 
 Email verification is planned, so `users.email_verified_at` is carried in the schema even though
 nothing writes it — turning the feature on later should be a feature, not a data migration. It needs

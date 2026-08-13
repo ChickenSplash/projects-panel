@@ -14,6 +14,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Volt::route('/my-projects', 'my-projects')->name('my-projects');
+    Volt::route('/profile', 'profile')->name('profile');
 
     Route::post('/logout', function (Request $request) {
         Auth::logout();
