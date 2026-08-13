@@ -64,6 +64,13 @@
         </svg>
         @break
 
+    @case('key')
+        <svg {{ $svg }}>
+            <circle cx="15" cy="9" r="4.5" />
+            <path d="M11.8 12.2 4 20m3-3 2.2 2.2" />
+        </svg>
+        @break
+
     @case('exit')
         <svg {{ $svg }}>
             <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M11 8.5 14.5 12 11 15.5M14.5 12H4" />
