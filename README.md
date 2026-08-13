@@ -99,6 +99,32 @@ the environment to keep sessions valid across rebuilds:
 APP_KEY=$(docker compose run --rm --no-deps app php artisan key:generate --show) docker compose up -d
 ```
 
+### Reset the database
+
+That surviving volume is a trap while the schema is still moving. A migration that has already run is
+recorded in the `migrations` table, so editing it in place changes nothing on an existing install:
+`migrate` reports "Nothing to migrate" and the app then queries columns the database does not have.
+It surfaces as a 500 on whatever touches the changed table — a rename of `users.name` to
+`users.username`, for instance, breaks registration with `table users has no column named username`.
+
+`APP_DEBUG` is off in `docker-compose.yml`, so the browser only shows a bare 500. The reason is in
+the log:
+
+```bash
+docker compose exec app tail -50 storage/logs/laravel.log
+```
+
+There is nothing here worth migrating data for, so throw the database away and let the entrypoint
+build a new one. `-v` is what removes the volume; without it the old file survives:
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
+Every account, session and project goes with it — register again afterwards. Locally the equivalent
+is `php artisan migrate:fresh`.
+
 ## Run it locally instead
 
 ```bash
