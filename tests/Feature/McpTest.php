@@ -4,10 +4,14 @@ namespace Tests\Feature;
 
 use App\Mcp\Servers\ProjectsServer;
 use App\Mcp\Tools\CreateProjectTool;
+use App\Mcp\Tools\DeleteProjectTool;
+use App\Mcp\Tools\ListProjectsTool;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -145,6 +149,125 @@ class McpTest extends TestCase
         $this->assertDatabaseCount('projects', 0);
     }
 
+    public function test_listing_reads_back_the_shelf_newest_first(): void
+    {
+        $user = User::factory()->create();
+        $older = Project::factory()->for($user)->create(['created_at' => now()->subDay()]);
+        $newer = Project::factory()->for($user)->create(['created_at' => now()]);
+
+        ProjectsServer::actingAs($user)
+            ->tool(ListProjectsTool::class)
+            ->assertOk()
+            ->assertHasNoErrors()
+            ->assertStructuredContent([
+                'total' => 2,
+                'showing' => 2,
+                'projects' => [
+                    ['id' => $newer->id, 'title' => $newer->title, 'link' => $newer->url, 'posted_at' => $newer->created_at->toIso8601String()],
+                    ['id' => $older->id, 'title' => $older->title, 'link' => $older->url, 'posted_at' => $older->created_at->toIso8601String()],
+                ],
+            ]);
+    }
+
+    public function test_listing_shows_nobody_elses_shelf(): void
+    {
+        $user = User::factory()->create();
+        $mine = Project::factory()->for($user)->create();
+        Project::factory()->for(User::factory())->create(['title' => 'Somebody Elses']);
+
+        ProjectsServer::actingAs($user)
+            ->tool(ListProjectsTool::class)
+            ->assertOk()
+            ->assertDontSee('Somebody Elses')
+            ->assertStructuredContent(fn (AssertableJson $json) => $json
+                ->where('total', 1)
+                ->where('showing', 1)
+                ->where('projects.0.id', $mine->id)
+                ->has('projects', 1)
+                ->etc());
+    }
+
+    public function test_listing_caps_what_it_reads_out_and_still_counts_the_rest(): void
+    {
+        $user = User::factory()->create();
+        Project::factory()->for($user)->count(4)->create();
+
+        ProjectsServer::actingAs($user)
+            ->tool(ListProjectsTool::class, ['limit' => 2])
+            ->assertOk()
+            // The total is the whole shelf rather than the page, so the model can tell there
+            // is more of it and ask for the rest.
+            ->assertStructuredContent(fn (AssertableJson $json) => $json
+                ->where('total', 4)
+                ->where('showing', 2)
+                ->has('projects', 2));
+    }
+
+    public function test_listing_refuses_a_limit_it_cannot_honour(): void
+    {
+        ProjectsServer::actingAs(User::factory()->create())
+            ->tool(ListProjectsTool::class, ['limit' => 500])
+            ->assertHasErrors(['at most 100']);
+    }
+
+    public function test_listing_an_empty_shelf_is_an_answer_rather_than_an_error(): void
+    {
+        ProjectsServer::actingAs(User::factory()->create())
+            ->tool(ListProjectsTool::class)
+            ->assertOk()
+            ->assertHasNoErrors()
+            ->assertStructuredContent(['total' => 0, 'showing' => 0, 'projects' => []]);
+    }
+
+    public function test_deleting_takes_a_project_off_the_shelf(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create(['title' => 'My Project']);
+
+        ProjectsServer::actingAs($user)
+            ->tool(DeleteProjectTool::class, ['id' => $project->id])
+            ->assertOk()
+            ->assertHasNoErrors()
+            ->assertSee('My Project');
+
+        $this->assertDatabaseMissing('projects', ['id' => $project->id]);
+    }
+
+    public function test_deleting_cannot_reach_somebody_elses_project(): void
+    {
+        $project = Project::factory()->for(User::factory())->create();
+
+        ProjectsServer::actingAs(User::factory()->create())
+            ->tool(DeleteProjectTool::class, ['id' => $project->id])
+            ->assertHasErrors();
+
+        $this->assertDatabaseHas('projects', ['id' => $project->id]);
+    }
+
+    public function test_deleting_says_the_same_thing_about_a_stranger_as_about_a_ghost(): void
+    {
+        // Telling the two apart would let a connector work out what other people have posted
+        // from the way it is turned down, so both get the same sentence.
+        $user = User::factory()->create();
+        $theirs = Project::factory()->for(User::factory())->create();
+        $ghost = $theirs->id + 1000;
+
+        ProjectsServer::actingAs($user)
+            ->tool(DeleteProjectTool::class, ['id' => $theirs->id])
+            ->assertHasErrors(["No project with id {$theirs->id} on this account's shelf"]);
+
+        ProjectsServer::actingAs($user)
+            ->tool(DeleteProjectTool::class, ['id' => $ghost])
+            ->assertHasErrors(["No project with id {$ghost} on this account's shelf"]);
+    }
+
+    public function test_deleting_needs_an_id(): void
+    {
+        ProjectsServer::actingAs(User::factory()->create())
+            ->tool(DeleteProjectTool::class, [])
+            ->assertHasErrors(['Send the id']);
+    }
+
     public function test_the_endpoint_turns_a_stranger_away_and_says_where_to_authenticate(): void
     {
         $response = $this->postJson('/mcp/projects', ['jsonrpc' => '2.0', 'id' => 1, 'method' => 'tools/list']);
@@ -198,14 +321,25 @@ class McpTest extends TestCase
         ]);
     }
 
-    public function test_the_tool_is_advertised_under_the_name_the_model_is_told_to_call(): void
+    public function test_the_tools_are_advertised_under_the_names_the_model_is_told_to_call(): void
     {
         $response = $this->rpc($this->accessTokenFor(User::factory()->create()), 'tools/list');
 
-        $response->assertOk()->assertJsonPath('result.tools.0.name', 'create-project');
+        $response->assertOk();
 
-        // Without a description the tool is listed but never chosen.
-        $this->assertNotEmpty($response->json('result.tools.0.description'));
+        $tools = collect($response->json('result.tools'))->keyBy('name');
+
+        $this->assertSame(
+            ['create-project', 'list-projects', 'delete-project'],
+            $tools->keys()->all(),
+        );
+
+        // Without a description a tool is listed but never chosen.
+        $tools->each(fn (array $tool) => $this->assertNotEmpty($tool['description'], "[{$tool['name']}] has no description."));
+
+        // The hints a client reads before deciding whether to ask the person first.
+        $this->assertTrue($tools['list-projects']['annotations']['readOnlyHint']);
+        $this->assertTrue($tools['delete-project']['annotations']['destructiveHint']);
     }
 
     public function test_a_sanctum_token_is_not_a_way_into_the_mcp_endpoint(): void

@@ -66,10 +66,23 @@ could then post a project on a signed-in user's behalf.
 
 ## MCP connector
 
-The same thing again for Claude: an MCP server at **`POST /mcp/projects`** offering one tool,
-`create-project`, which takes a title and a link and posts them to whoever authorised the connection.
-It ends in the same `create` call as the form and the API, so a project arrives owned and identical
-whichever of the three posted it.
+The same thing again for Claude: an MCP server at **`POST /mcp/projects`**, offering three tools over
+the shelf of whoever authorised the connection.
+
+| Tool | Takes | Does |
+|---|---|---|
+| `create-project` | `title`, `link` | Posts a project, through the same `create` call as the form and the API — so one arrives owned and identical whichever of the three posted it |
+| `list-projects` | `limit` (optional, 1–100, 25 by default) | Reads the shelf back newest first, with the id each other tool needs. Carries `readOnlyHint` |
+| `delete-project` | `id` | Removes one, scoped the same way the delete button is. Carries `destructiveHint`, so a client can ask before it happens |
+
+There is no edit: the app has none either, so the way to correct a project is to delete it and post it
+again. Everything is scoped to the account that authorised — an id belonging to someone else does not
+match, and is turned down in exactly the same words as an id that never existed, so the refusal cannot
+be used to go fishing for what other people have posted.
+
+`list-projects` answers with structured content against a declared `outputSchema`, and reports the
+whole shelf's `total` alongside the `showing` it returned, so a model that asked for ten of forty can
+tell there are thirty more rather than assuming it has seen everything.
 
 Claude will not hold a static token for a custom connector, so this endpoint is behind OAuth 2.1
 (Passport) rather than Sanctum. The two live side by side and neither opens the other's door — an
@@ -236,10 +249,13 @@ nothing here adds one, which matches the login page not being throttled either. 
 shown once, and replaced or revoked from the same page; anything more is a feature nobody has asked for
 yet, and the UI is a placeholder besides.
 
-The MCP server is one tool, and the same one endpoint underneath it: no resources, no prompts, and
-nothing that reads or removes a project. Its OAuth side is equally bare. There is a `mcp:use` scope
-because Laravel MCP registers one, but nothing checks it — one tool acting as one user leaves nothing
-for a second permission to mean. Token lifetimes are Passport's defaults, and there is no page listing
+The MCP server has no resources and no prompts, no editing (the app has none to expose), and no way
+to read anyone else's shelf — the front page is public in a browser, but that is not the same as
+handing a connector a feed of it. Its OAuth side is equally bare. There is a `mcp:use` scope
+because Laravel MCP registers one, but nothing checks it — three tools acting as one user, all of them
+already limited to that user's own shelf, leave nothing for a second permission to mean. A scope worth
+having would be one that grants posting without granting deleting, and that is a decision to make when
+somebody wants it. Token lifetimes are Passport's defaults, and there is no page listing
 what you have connected or letting you disconnect it: revoking means deleting the row for now.
 
 Email verification is planned, so `users.email_verified_at` is carried in the schema even though
