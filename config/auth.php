@@ -42,6 +42,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Passport, for the MCP endpoint's OAuth tokens. Sanctum is not listed here --
+        // it registers its own "sanctum" guard, which is why `auth:sanctum` already works.
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
     ],
 
     /*

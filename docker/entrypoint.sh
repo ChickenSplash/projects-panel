@@ -16,6 +16,14 @@ if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
     touch "$DB_DATABASE"
 fi
 
+# Passport signs its OAuth tokens with a keypair. Same story as APP_KEY: pass one in through
+# the environment, or get an ephemeral one that lasts as long as the container -- which asks
+# every connected client to authorise again after a restart.
+if [ -z "$PASSPORT_PRIVATE_KEY" ] && [ ! -f /app/storage/oauth-private.key ]; then
+    php artisan passport:keys --no-interaction
+    echo "entrypoint: no Passport keys given, generated an ephemeral pair for this container."
+fi
+
 php artisan migrate --force --graceful
 php artisan config:cache
 php artisan route:cache

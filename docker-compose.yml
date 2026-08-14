@@ -15,6 +15,10 @@ services:
             # used for links generated outside a request; normal requests use the forwarded host.
             APP_URL: '${APP_URL:-http://project-panel:3000}'
             APP_KEY: '${APP_KEY:-}'
+            # Passport's token signing keys. Leave them empty and the container makes an
+            # ephemeral pair, which asks every connector to authorise again on restart.
+            PASSPORT_PRIVATE_KEY: '${PASSPORT_PRIVATE_KEY:-}'
+            PASSPORT_PUBLIC_KEY: '${PASSPORT_PUBLIC_KEY:-}'
             DB_CONNECTION: sqlite
             DB_DATABASE: /app/database/database.sqlite
             SESSION_DRIVER: database
