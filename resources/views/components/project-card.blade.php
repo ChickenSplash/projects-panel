@@ -4,7 +4,7 @@
     One row of a project list. `confirming` belongs to the delete control that
     "My projects" drops into the slot; the shared list leaves the slot empty.
 --}}
-<li wire:key="project-{{ $project->id }}" x-data="{ confirming: false }" x-dream
+<li wire:key="project-{{ $project->id }}" x-data="{ confirming: false }" x-init="$dream.enter($el)"
     {{ $attributes->merge(['class' => 'dream-card flex items-center justify-between gap-4 px-5 py-4']) }}>
     <div class="min-w-0">
         <a href="{{ $project->url }}" target="_blank" rel="noopener noreferrer"

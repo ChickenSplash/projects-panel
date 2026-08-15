@@ -28,7 +28,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="mx-auto max-w-sm" x-dream>
+<div class="mx-auto max-w-sm" x-data x-init="$dream.enter($el)">
     <div class="dream-panel p-7">
         <h1 class="font-display text-3xl font-semibold">Register</h1>
         <p class="mt-1.5 text-sm text-ink-soft dark:text-moon-soft">Create an account to post projects.</p>

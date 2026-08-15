@@ -41,12 +41,12 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-8">
-    <header x-dream>
+    <header x-data x-init="$dream.enter($el)">
         <h1 class="font-display text-4xl font-semibold">API token</h1>
         <p class="mt-2 text-ink-soft dark:text-moon-soft">Post projects from outside the app.</p>
     </header>
 
-    <section x-dream class="dream-panel space-y-5 p-6">
+    <section x-data x-init="$dream.enter($el)" class="dream-panel space-y-5 p-6">
         @if ($plainTextToken)
             <div>
                 <h2 class="font-display text-xl font-semibold">Your new token</h2>
@@ -89,7 +89,7 @@ new class extends Component {
         </div>
     </section>
 
-    <section x-dream class="dream-panel space-y-4 p-6">
+    <section x-data x-init="$dream.enter($el)" class="dream-panel space-y-4 p-6">
         <div>
             <h2 class="font-display text-xl font-semibold">Posting a project</h2>
             <p class="mt-1.5 text-sm text-ink-soft dark:text-moon-soft">

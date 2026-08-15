@@ -7,11 +7,9 @@ import { animate } from 'motion';
 | reacting. The perpetual background drift is CSS, because it should not need a
 | main-thread frame every 16ms for as long as the tab is open.
 |
-| Markup asks for an entrance with the `x-dream` directive, and reaches
-| everything else through the `$dream` Alpine magic, e.g.
+| Markup reaches this through the `$dream` Alpine magic, e.g.
 |
-|     <li x-dream>
-|     <button x-on:click="await $dream.leave($root)">
+|     <li x-data x-init="$dream.enter($el)">
 */
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -81,15 +79,6 @@ function release(el) {
     el.style.transform = '';
 }
 
-/**
- * The stylesheet keeps `x-dream` elements hidden until this script gets to them,
- * so the page cannot paint them at full opacity first. Dropping the attribute is
- * how an element stops being the stylesheet's problem and starts being ours.
- */
-function reveal(el) {
-    el.removeAttribute('x-dream');
-}
-
 function flush() {
     const batch = pending;
     pending = [];
@@ -135,14 +124,11 @@ const dream = {
     /** Entrance for a card, a row, or anything else that just appeared. */
     enter(el) {
         if (reduced.matches || ! isNew(el)) {
-            reveal(el);
-
             return;
         }
 
-        // Take over the stylesheet's hold on it without letting go for a frame in between.
+        // Hide it in the same tick it was inserted, so nothing flashes before the frame lands.
         el.style.opacity = '0';
-        reveal(el);
 
         if (pending.push(el) === 1) {
             // Read now rather than in the frame that flushes: by then the page has settled.
@@ -206,13 +192,7 @@ const dream = {
     },
 };
 
-document.addEventListener('alpine:init', () => {
-    window.Alpine.magic('dream', () => dream);
-
-    // `x-dream` rather than `x-init="$dream.enter($el)"` so that one attribute both
-    // hides the element in CSS and animates it here; the two cannot drift apart.
-    window.Alpine.directive('dream', (el) => dream.enter(el));
-});
+document.addEventListener('alpine:init', () => window.Alpine.magic('dream', () => dream));
 
 // A page counts as settled once its markup has been through Alpine, because from then
 // on anything new can only have come from the user. wire:navigate swaps the DOM

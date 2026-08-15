@@ -58,27 +58,6 @@
     [x-cloak] {
         display: none !important;
     }
-
-    /*
-    | Anything waiting for an entrance starts hidden here rather than in script.
-    | The markup can be on screen for a while before `app.js` has loaded and
-    | Alpine has booted, and hiding something the browser has already painted
-    | reads as the entrance running twice. `$dream.enter` drops the attribute as
-    | it takes the element over, which hands opacity back to this stylesheet.
-    */
-    [x-dream] {
-        opacity: 0;
-    }
-
-    /*
-    | Neither of these ever gets an entrance to wait for: reduced motion skips
-    | the animation, and without script nothing would ever drop the attribute.
-    */
-    @media (prefers-reduced-motion: reduce), (scripting: none) {
-        [x-dream] {
-            opacity: 1;
-        }
-    }
 }
 
 /*

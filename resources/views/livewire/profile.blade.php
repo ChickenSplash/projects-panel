@@ -69,12 +69,12 @@ new class extends Component {
 }; ?>
 
 <div class="space-y-8">
-    <header x-dream>
+    <header x-data x-init="$dream.enter($el)">
         <h1 class="font-display text-4xl font-semibold">Profile</h1>
         <p class="mt-2 text-ink-soft dark:text-moon-soft">Change who you are here, or disappear entirely.</p>
     </header>
 
-    <form wire:submit="save" x-dream class="dream-panel space-y-5 p-6">
+    <form wire:submit="save" x-data x-init="$dream.enter($el)" class="dream-panel space-y-5 p-6">
         <h2 class="font-display text-xl font-semibold">Your details</h2>
 
         <x-field name="username" label="Username" autocomplete="username" />
@@ -87,7 +87,7 @@ new class extends Component {
         </button>
     </form>
 
-    <form wire:submit="updatePassword" x-dream class="dream-panel space-y-5 p-6">
+    <form wire:submit="updatePassword" x-data x-init="$dream.enter($el)" class="dream-panel space-y-5 p-6">
         <h2 class="font-display text-xl font-semibold">Password</h2>
 
         <x-field name="current_password" label="Current password" type="password" autocomplete="current-password" />
@@ -101,7 +101,7 @@ new class extends Component {
     </form>
 
     {{-- Two taps rather than a browser confirm dialog, the same as deleting a project. --}}
-    <section x-data="{ confirming: false }" x-dream class="dream-panel space-y-4 p-6">
+    <section x-data="{ confirming: false }" x-init="$dream.enter($el)" class="dream-panel space-y-4 p-6">
         <div>
             <h2 class="font-display text-xl font-semibold">Delete account</h2>
             <p class="mt-1.5 text-sm text-ink-soft dark:text-moon-soft">
