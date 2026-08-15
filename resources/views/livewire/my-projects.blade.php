@@ -43,12 +43,12 @@ new class extends Component {
 }; ?>
 
 <div>
-    <header x-data x-init="$dream.enter($el)">
+    <header x-dream>
         <h1 class="font-display text-4xl font-semibold">My projects</h1>
         <p class="mt-2 text-ink-soft dark:text-moon-soft">Post a project with a link.</p>
     </header>
 
-    <form wire:submit="save" x-data x-init="$dream.enter($el)" class="dream-panel mt-8 space-y-5 p-6">
+    <form wire:submit="save" x-dream class="dream-panel mt-8 space-y-5 p-6">
         <x-field name="title" label="Title" placeholder="My side project" />
         <x-field name="url" label="Link" type="url" placeholder="https://example.com" />
 
@@ -80,7 +80,7 @@ new class extends Component {
                 </div>
             </x-project-card>
         @empty
-            <li x-data x-init="$dream.enter($el)" class="dream-panel px-6 py-14 text-center">
+            <li x-dream class="dream-panel px-6 py-14 text-center">
                 <x-icon name="sparkle" class="mx-auto size-8 text-violet-400 dark:text-violet-300" />
                 <p class="mt-3 font-display text-xl font-semibold">Your shelf is empty</p>
                 <p class="mt-1 text-sm text-ink-soft dark:text-moon-soft">Post something above and it will land here.</p>
