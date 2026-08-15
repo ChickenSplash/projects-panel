@@ -134,15 +134,29 @@
         box-shadow: 0 24px 60px -30px oklch(0.45 0.16 300 / 0.5);
     }
 
+    /*
+    | This is the one surface that both Motion and the stylesheet move, so the two
+    | have to be kept off each other's property. Motion owns `opacity` and
+    | `transform` for the entrance; the hover below is only allowed the rest.
+    |
+    | Tailwind's `transition` covers opacity and transform among others, and left
+    | that way it fights the entrance twice over: every frame Motion writes starts
+    | a half-second transition of its own, so the rise arrives late and smeared,
+    | and the hand-off when the animation ends reads as a plain style change, which
+    | fades the card in all over again. Firefox plays both, Chromium hides them.
+    */
     .dream-card {
         @apply rounded-3xl border border-white/70 bg-white/55 backdrop-blur-xl transition duration-500 dark:border-white/[0.08] dark:bg-white/[0.03];
         box-shadow: 0 16px 40px -28px oklch(0.45 0.16 300 / 0.55);
+        transition-property: background-color, border-color, box-shadow, translate;
     }
 
     .dream-card:hover {
         @apply border-white/90 bg-white/75 dark:border-white/20 dark:bg-white/[0.07];
         box-shadow: 0 26px 55px -28px oklch(0.5 0.19 305 / 0.6);
-        transform: translateY(-2px);
+        /* `translate`, not `transform`: it composes with the entrance rather than
+           overwriting it, so a card can be hovered while it is still arriving. */
+        translate: 0 -2px;
     }
 
     /*
