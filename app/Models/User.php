@@ -19,6 +19,12 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory;
 
+    /** @return HasMany<GratitudeEntry, $this> */
+    public function gratitudeEntries(): HasMany
+    {
+        return $this->hasMany(GratitudeEntry::class)->latest('entry_date');
+    }
+
     /** @return HasMany<Project, $this> */
     public function projects(): HasMany
     {

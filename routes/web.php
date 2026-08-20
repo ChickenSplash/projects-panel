@@ -14,6 +14,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Volt::route('/my-projects', 'my-projects')->name('my-projects');
+    Volt::route('/gratitude', 'gratitude')->name('gratitude');
     Volt::route('/profile', 'profile')->name('profile');
     Volt::route('/api-token', 'api-token')->name('api-token');
 

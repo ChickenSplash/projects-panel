@@ -93,7 +93,7 @@
             </div>
 
             <nav class="mt-3 flex items-center gap-1.5 px-1">
-                @foreach ([['projects', 'All projects'], ['my-projects', 'My projects']] as [$route, $label])
+                @foreach ([['projects', 'All projects'], ['my-projects', 'My projects'], ['gratitude', 'Gratitude']] as [$route, $label])
                     <a href="{{ route($route) }}" wire:navigate
                         @class([
                             'dream-tab',
