@@ -71,12 +71,28 @@ function isNew(el) {
 }
 
 /**
+ * Motion writes a style attribute every frame, and an element with a `transition`
+ * covering those properties would rather animate each write itself -- so it chases
+ * Motion half a second behind, and Firefox fades the whole entrance a second time
+ * when the animation is torn down (Mozilla bug 1192592). Off for the duration.
+ */
+function suspend(el) {
+    el.style.transitionProperty = 'none';
+}
+
+/**
  * Motion leaves the last frame behind as an inline style. Clearing it hands the
- * element back to the stylesheet, which owns the hover lift on these cards.
+ * element back to the stylesheet, which owns the hover lift on these cards. The
+ * transition comes back a frame later, once that hand-back has been painted, so
+ * it has nothing left to animate.
  */
 function release(el) {
     el.style.opacity = '';
     el.style.transform = '';
+
+    requestAnimationFrame(() => {
+        el.style.transitionProperty = '';
+    });
 }
 
 function flush() {
@@ -128,6 +144,7 @@ const dream = {
         }
 
         // Hide it in the same tick it was inserted, so nothing flashes before the frame lands.
+        suspend(el);
         el.style.opacity = '0';
 
         if (pending.push(el) === 1) {
@@ -147,6 +164,8 @@ const dream = {
         }
 
         const height = el.offsetHeight;
+
+        suspend(el);
 
         el.style.overflow = 'hidden';
 
@@ -183,6 +202,8 @@ const dream = {
         if (reduced.matches) {
             return;
         }
+
+        suspend(el);
 
         done(animate(
             el,

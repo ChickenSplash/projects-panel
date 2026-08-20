@@ -24,6 +24,24 @@
     --ease-dream: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/*
+| The house transition
+|
+| Everything a hover changes, minus `opacity`. Motion drives opacity on the way
+| in, over an underlying value the entrance has pinned at 0; the moment Motion
+| hands the element back, that underlying value flips to 1 and a blanket
+| `transition` animates the flip -- which Firefox renders as the whole entrance
+| running a second time, after a blink (Mozilla bug 1192592). Chrome does not.
+| `transform` stays in, because the hover lift needs it; `app.js` turns
+| transitions off for the length of an animation so Motion's per-frame writes
+| cannot start one.
+*/
+@utility transition-dream {
+    transition-property: color, background-color, border-color, text-decoration-color, box-shadow, filter, backdrop-filter, transform;
+    transition-timing-function: var(--default-transition-timing-function);
+    transition-duration: var(--default-transition-duration);
+}
+
 @layer base {
     :root {
         color-scheme: light;
@@ -135,7 +153,7 @@
     }
 
     .dream-card {
-        @apply rounded-3xl border border-white/70 bg-white/55 backdrop-blur-xl transition duration-500 dark:border-white/[0.08] dark:bg-white/[0.03];
+        @apply rounded-3xl border border-white/70 bg-white/55 backdrop-blur-xl transition-dream duration-500 dark:border-white/[0.08] dark:bg-white/[0.03];
         box-shadow: 0 16px 40px -28px oklch(0.45 0.16 300 / 0.55);
     }
 
@@ -149,7 +167,7 @@
     | Controls
     */
     .dream-btn {
-        @apply relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition duration-300;
+        @apply relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-dream duration-300;
         background-image: linear-gradient(120deg, oklch(0.7 0.19 300), oklch(0.68 0.2 340), oklch(0.72 0.15 255));
         background-size: 200% 200%;
         box-shadow: 0 12px 30px -12px oklch(0.6 0.21 315 / 0.75);
@@ -166,7 +184,7 @@
     }
 
     .dream-btn-danger {
-        @apply cursor-pointer rounded-full px-3.5 py-2 text-sm font-semibold text-white transition duration-300;
+        @apply cursor-pointer rounded-full px-3.5 py-2 text-sm font-semibold text-white transition-dream duration-300;
         background-image: linear-gradient(120deg, oklch(0.65 0.2 20), oklch(0.6 0.22 2));
         box-shadow: 0 12px 28px -14px oklch(0.6 0.22 15 / 0.9);
     }
@@ -176,15 +194,15 @@
     }
 
     .dream-btn-quiet {
-        @apply cursor-pointer rounded-full border border-white/70 bg-white/50 px-4 py-2 text-sm font-semibold text-ink-soft transition duration-300 hover:border-white hover:bg-white/80 hover:text-ink dark:border-white/10 dark:bg-white/5 dark:text-moon-soft dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-moon;
+        @apply cursor-pointer rounded-full border border-white/70 bg-white/50 px-4 py-2 text-sm font-semibold text-ink-soft transition-dream duration-300 hover:border-white hover:bg-white/80 hover:text-ink dark:border-white/10 dark:bg-white/5 dark:text-moon-soft dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-moon;
     }
 
     .dream-link {
-        @apply cursor-pointer rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft transition duration-300 hover:bg-white/60 hover:text-ink dark:text-moon-soft dark:hover:bg-white/10 dark:hover:text-moon;
+        @apply cursor-pointer rounded-full px-3 py-1.5 text-sm font-semibold text-ink-soft transition-dream duration-300 hover:bg-white/60 hover:text-ink dark:text-moon-soft dark:hover:bg-white/10 dark:hover:text-moon;
     }
 
     .dream-input {
-        @apply w-full rounded-2xl border border-white/80 bg-white/70 px-4 py-2.5 text-sm text-ink transition duration-300 outline-none placeholder:text-ink-soft/60 dark:border-white/10 dark:bg-white/5 dark:text-moon dark:placeholder:text-moon-soft/50;
+        @apply w-full rounded-2xl border border-white/80 bg-white/70 px-4 py-2.5 text-sm text-ink transition-dream duration-300 outline-none placeholder:text-ink-soft/60 dark:border-white/10 dark:bg-white/5 dark:text-moon dark:placeholder:text-moon-soft/50;
     }
 
     .dream-input:focus {
@@ -204,7 +222,7 @@
     | Navigation
     */
     .dream-tab {
-        @apply rounded-full px-4 py-2 text-sm font-semibold transition duration-300;
+        @apply rounded-full px-4 py-2 text-sm font-semibold transition-dream duration-300;
     }
 
     .dream-tab-idle {
@@ -228,7 +246,7 @@
     | left for the initial. The panel is a smaller, tighter `dream-panel`.
     */
     .dream-user {
-        @apply flex cursor-pointer items-center gap-2 rounded-full border border-white/70 bg-white/50 py-1 pr-3 pl-1 text-sm font-semibold text-ink-soft transition duration-300 hover:border-white hover:bg-white/80 hover:text-ink dark:border-white/10 dark:bg-white/5 dark:text-moon-soft dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-moon;
+        @apply flex cursor-pointer items-center gap-2 rounded-full border border-white/70 bg-white/50 py-1 pr-3 pl-1 text-sm font-semibold text-ink-soft transition-dream duration-300 hover:border-white hover:bg-white/80 hover:text-ink dark:border-white/10 dark:bg-white/5 dark:text-moon-soft dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-moon;
     }
 
     .dream-user-mark {
@@ -243,11 +261,11 @@
     }
 
     .dream-menu-item {
-        @apply flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft transition duration-200 hover:bg-white/70 hover:text-ink dark:text-moon-soft dark:hover:bg-white/10 dark:hover:text-moon;
+        @apply flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft transition-dream duration-200 hover:bg-white/70 hover:text-ink dark:text-moon-soft dark:hover:bg-white/10 dark:hover:text-moon;
     }
 
     .dream-switch button {
-        @apply cursor-pointer rounded-full p-1.5 text-ink-soft transition duration-300 hover:text-ink dark:text-moon-soft dark:hover:text-moon;
+        @apply cursor-pointer rounded-full p-1.5 text-ink-soft transition-dream duration-300 hover:text-ink dark:text-moon-soft dark:hover:text-moon;
     }
 
     .dream-switch button[data-active='true'] {
