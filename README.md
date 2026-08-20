@@ -30,3 +30,5 @@ APP_KEY=$(docker compose run --rm --no-deps app php artisan key:generate --show)
 ```
 
 Open <http://localhost:3000> and register an account.
+
+Publicly hosted at https://chickensplash.dpdns.org
