@@ -16,7 +16,7 @@ services:
             APP_URL: '${APP_URL:-http://project-panel:3000}'
             APP_KEY: '${APP_KEY:-}'
             DB_CONNECTION: sqlite
-            DB_DATABASE: /app/database/database.sqlite
+            DB_DATABASE: /app/data/database.sqlite
             SESSION_DRIVER: database
             CACHE_STORE: database
             QUEUE_CONNECTION: sync
@@ -33,7 +33,8 @@ services:
             MAIL_FROM_NAME: 'Portfolio'
             LOG_CHANNEL: stderr
         volumes:
-            - database:/app/database
+            # Not /app/database: a volume there hides any migration added after it was created.
+            - database:/app/data
         networks:
             - edge
         restart: unless-stopped

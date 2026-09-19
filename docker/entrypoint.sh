@@ -12,7 +12,7 @@ fi
 
 # SQLite lives on a volume, so the file may not exist yet on a fresh container.
 if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
-    : "${DB_DATABASE:=/app/database/database.sqlite}"
+    : "${DB_DATABASE:=/app/data/database.sqlite}"
     touch "$DB_DATABASE"
 fi
 

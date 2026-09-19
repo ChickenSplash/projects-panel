@@ -29,10 +29,10 @@ COPY --from=assets /app/public/build ./public/build
 # round trips from queueing behind each other.
 ENV PHP_CLI_SERVER_WORKERS=4
 
-RUN mkdir -p database \
+RUN mkdir -p data \
         storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
         bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache database
+    && chown -R www-data:www-data storage bootstrap/cache data
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
