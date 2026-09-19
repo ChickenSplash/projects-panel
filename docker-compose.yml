@@ -20,6 +20,18 @@ services:
             SESSION_DRIVER: database
             CACHE_STORE: database
             QUEUE_CONNECTION: sync
+            # Contact form messages: readable by the account with ADMIN_EMAIL and mailed to it.
+            # Until MAIL_MAILER=smtp is set, the mail only goes to the container log.
+            ADMIN_EMAIL: '${ADMIN_EMAIL:-}'
+            MAIL_MAILER: '${MAIL_MAILER:-log}'
+            MAIL_SCHEME: smtps
+            MAIL_HOST: smtp.gmail.com
+            MAIL_PORT: 465
+            MAIL_USERNAME: '${MAIL_USERNAME:-}'
+            MAIL_PASSWORD: '${MAIL_PASSWORD:-}'
+            MAIL_FROM_ADDRESS: '${MAIL_USERNAME:-hello@example.com}'
+            MAIL_FROM_NAME: 'Portfolio'
+            LOG_CHANNEL: stderr
         volumes:
             - database:/app/database
         networks:

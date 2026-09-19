@@ -71,6 +71,13 @@
         </svg>
         @break
 
+    @case('mail')
+        <svg {{ $svg }}>
+            <rect x="3" y="5" width="18" height="14" rx="2.5" />
+            <path d="m4 7.5 8 5.5 8-5.5" />
+        </svg>
+        @break
+
     @case('exit')
         <svg {{ $svg }}>
             <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M11 8.5 14.5 12 11 15.5M14.5 12H4" />

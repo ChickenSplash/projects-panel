@@ -103,6 +103,22 @@
                         {{ $label }}
                     </a>
                 @endforeach
+
+                @can('read-messages')
+                    @php($unread = \App\Models\Message::unread()->count())
+
+                    <a href="{{ route('messages') }}" wire:navigate
+                        @class([
+                            'dream-tab inline-flex items-center gap-2',
+                            'dream-tab-active' => request()->routeIs('messages'),
+                            'dream-tab-idle' => ! request()->routeIs('messages'),
+                        ])>
+                        Messages
+                        @if ($unread)
+                            <span class="rounded-full bg-violet-500 px-1.5 text-xs leading-5 text-white">{{ $unread }}</span>
+                        @endif
+                    </a>
+                @endcan
             </nav>
         </header>
 

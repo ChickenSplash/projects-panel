@@ -16,6 +16,7 @@ Route::middleware('auth')->group(function () {
     Volt::route('/my-projects', 'my-projects')->name('my-projects');
     Volt::route('/profile', 'profile')->name('profile');
     Volt::route('/api-token', 'api-token')->name('api-token');
+    Volt::route('/messages', 'messages')->middleware('can:read-messages')->name('messages');
 
     Route::post('/logout', function (Request $request) {
         Auth::logout();
